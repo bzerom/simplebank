@@ -23,6 +23,9 @@ jobs:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: simple_bank
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -31,24 +34,24 @@ jobs:
           --health-retries 5
 
     steps:
-    - name: Set up Go 1.7.2
-      uses: actions/setup-go@v3
-      with:
-        go-version: ^1.17
-      id: go # unique identifier for this specific step
+      - name: Set up Go 1.7.2
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.17
+        id: go # unique identifier for this specific step
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
 
-    - name: Install golang-migrate
-      # In order for the migrate command to work we need to move it to /user/bin
-      run: |
-        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.darwin-arm64.tar.gz | tar xvz
-        sudo mv migrate /usr/bin/
-        which migrate
+      - name: Install golang-migrate
+        # In order for the migrate command to work we need to move it to /user/bin
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.darwin-arm64.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/
+          which migrate
 
-    - name: Run migration
-      run: make migrateup
+      - name: Run migration
+        run: make migrateup
 
-    - name: Test
-      run: make test
+      - name: Test
+        run: make test
